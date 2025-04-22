@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "hyenamod",
+  "version": "${version}",
+  "name": "Hyena Mod",
+  "description": "Hyenas for Minecraft",
+  "authors": ["TheBetterTruth"],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/hyenamod/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "io.github.thebettertruth.hyenamod.client.HyenaModClient"
+    ],
+    "main": [
+      "io.github.thebettertruth.hyenamod.HyenaMod"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "~${minecraft_version}"
+  }
+}
