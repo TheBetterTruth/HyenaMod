@@ -24,13 +24,18 @@ public class HyenaHeldItemFeatureRenderer extends FeatureRenderer<HyenaEntityRen
 
 		if (!itemRenderState.isEmpty()) {
 			matrixStack.push();
+
+			// Place the item somewhere around the hyenas head
 			matrixStack.translate(this.getContextModel().getHead().originX / 16.0F, this.getContextModel().getHead().originY / 16.0F, this.getContextModel().getHead().originZ / 16.0F);
 
+			// Rotate it with the hyenas head
 			matrixStack.multiply(RotationAxis.POSITIVE_Y.rotation(this.getContextModel().getHead().yaw));
 			matrixStack.multiply(RotationAxis.POSITIVE_X.rotation(this.getContextModel().getHead().pitch));
 
+			// Move it towards the snouth/mouth
 			matrixStack.translate(0.0F, 0.19F, -0.7F);
 
+			// Adjust its rotation so that it looks more like it is held by the hyena
 			matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-75.0F));
 
 			itemRenderState.render(matrixStack, vertexConsumerProvider, light, OverlayTexture.DEFAULT_UV);

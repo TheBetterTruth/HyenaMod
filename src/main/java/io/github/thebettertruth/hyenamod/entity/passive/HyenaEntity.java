@@ -32,15 +32,19 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class HyenaEntity extends AnimalEntity implements Angerable {
+	// Time in ticks a hyena takes to eat
 	public static final int EATING_TIME = 20;
+	// "Pivot" to base random number of ticks on it should take for a hyena to consume the current item
 	public static final int SHOULD_EAT_TIMER_BASE = 600;
 
 	private static final TrackedData<Integer> ANGER_TIME = DataTracker.registerData(HyenaEntity.class, TrackedDataHandlerRegistry.INTEGER);
 	private static final UniformIntProvider ANGER_TIME_RANGE = TimeHelper.betweenSeconds(30, 40);
 	private static final List<Item> PREFERRED_ITEMS = Arrays.asList(Items.BEEF, Items.MUTTON, Items.PORKCHOP, Items.CHICKEN, Items.RABBIT, Items.COOKED_BEEF, Items.COOKED_MUTTON, Items.COOKED_PORKCHOP, Items.COOKED_RABBIT, Items.ROTTEN_FLESH);
 
-
+	// Timer that counts down until hyena consumes item
 	private float shouldEatTimer;
+	// Timer that counts down when a hyena begins to consume item
+	// Allows for eating sounds to be player for a brief amount of time.
 	private float eatingTime;
 
 	@Nullable
@@ -68,7 +72,7 @@ public class HyenaEntity extends AnimalEntity implements Angerable {
 	@Override
 	protected void initGoals() {
 		this.goalSelector.add(1, new SwimGoal(this));
-		this.goalSelector.add(2, new FleeEntityGoal<>(this, LlamaEntity.class, 24.0F, 1.5D, 1.5D));
+		this.goalSelector.add(2, new FleeEntityGoal<>(this, LlamaEntity.class, 24.0F, 1.5D, 1.5D)); // Because llamas spit
 		this.goalSelector.add(3, new PounceAtTargetGoal(this, 0.4F));
 		this.goalSelector.add(4, new MeleeAttackGoal(this, 1.0D, true));
 		this.goalSelector.add(5, new PickupItemGoal());
@@ -84,12 +88,16 @@ public class HyenaEntity extends AnimalEntity implements Angerable {
 
 			if (this.getMainHandStack().isEmpty() || !this.getMainHandStack().contains(DataComponentTypes.FOOD)) {
 				if (t == EntityType.SHEEP || t == EntityType.CHICKEN || t == EntityType.RABBIT || t == EntityType.CAT || t == EntityType.OCELOT) {
+					// Attack above animals, when not carrying food to gather food
 					return true;
 				}
 				else if (t != HyenaMod.HYENA && entity.getHealth() <= 8) {
+					// If test entity is none of the above, but a non-hyena with low health, attack as well
 					return true;
 				}
 			}
+
+			// If none of the above, attack untamed wolves (none of us wants to lose their pets :()
 			return t == EntityType.WOLF && ((WolfEntity) entity).isTamed();
 		}));
 		this.targetSelector.add(3, new UniversalAngerGoal<>(this, true));
@@ -100,10 +108,12 @@ public class HyenaEntity extends AnimalEntity implements Angerable {
 		super.tick();
 
 		if (!this.getMainHandStack().isEmpty()) {
+			// Count down timer while there having an item
 			shouldEatTimer--;
 		}
 	}
 
+	// Who did this?
 	@Override
 	public boolean isBreedingItem(ItemStack stack) {
 		return stack.getItem() == Items.ROTTEN_FLESH;
@@ -158,6 +168,8 @@ public class HyenaEntity extends AnimalEntity implements Angerable {
 	public void readCustomDataFromNbt(NbtCompound nbt) {
 		super.readCustomDataFromNbt(nbt);
 
+		// Because Mojang made it so is always defaulted to false, no matter what the constructor does
+		// because NBT-tags are read on spawn and override fields.
 		if (!nbt.contains("CanPickupLoot")) {
 			this.setCanPickUpLoot(true);
 		}
@@ -210,6 +222,7 @@ public class HyenaEntity extends AnimalEntity implements Angerable {
 		this.getWorld().spawnEntity(new ItemEntity(this.getWorld(), this.getX(), this.getY(), this.getZ(), itemStack));
 	}
 
+	// Drop the currently held item when killed
 	@Override
 	protected void drop(ServerWorld world, DamageSource damageSource) {
 		ItemStack itemStack = this.getMainHandStack();
@@ -224,13 +237,17 @@ public class HyenaEntity extends AnimalEntity implements Angerable {
 	@Override
 	public boolean canPickupItem(ItemStack item) {
 		if (this.getMainHandStack().isEmpty()) {
+			// Items can be picked up, when hyena has none collected
 			return true;
 		}
 		else {
+			// Otherwise, when the item is preferred over the currently held item, it can also be picked up
 			return this.prefersItemOverEquipped(item);
 		}
 	}
 
+	// Somehow there are kind of multiple functions.
+	// But it works, don't attempt to fix it.
 	@Override
 	public boolean canGather(ServerWorld world, ItemStack stack) {
 		return this.canPickupItem(stack);
@@ -254,6 +271,11 @@ public class HyenaEntity extends AnimalEntity implements Angerable {
 	}
 
 	private boolean prefersItemOverEquipped(ItemStack itemStack) {
+		// This can probably be cleaned up somehow
+		// Just compares a potential collectible item with the current item
+		// If the potential collectible item is in the list of preferred items (and the current item not)
+		// or if the potential collectible item is further at the front of the list
+		// then it is preferred over the equipped item.
 		ItemStack equippedStack = this.getMainHandStack();
 
 		boolean prefersItemStack = this.prefersItem(itemStack);
@@ -271,6 +293,7 @@ public class HyenaEntity extends AnimalEntity implements Angerable {
 	}
 
 	protected void resetEatingTimer() {
+		// Just keep a constant eat-duration
 		this.eatingTime = HyenaEntity.EATING_TIME;
 
 		ItemStack itemStack = this.getMainHandStack();
@@ -278,18 +301,24 @@ public class HyenaEntity extends AnimalEntity implements Angerable {
 		if (itemStack.isEmpty()) return;
 
 		if (itemStack.contains(DataComponentTypes.FOOD)) {
+			// Some weird formula to calculate a weird random time the hyena should wait before consuming food
 			this.shouldEatTimer = HyenaEntity.SHOULD_EAT_TIMER_BASE * (this.random.nextFloat() + this.random.nextFloat());
 		}
 		else {
+			// A more weird formula, should produce a longer wait-time than the above, if the item is not  food.
 			this.shouldEatTimer = HyenaEntity.SHOULD_EAT_TIMER_BASE * (this.random.nextFloat() + this.random.nextFloat()) * (1 + this.random.nextFloat() * 2);
 		}
 	}
 
 	public static boolean canSpawn(EntityType<HyenaEntity> ignoredType, WorldAccess worldAccess, SpawnReason ignoredSpawnReason, BlockPos pos, Random ignoredRandom) {
+		// How does one make BlockTags?
+		// VALID_SPAWN is fair enough, I guess...
 		return worldAccess.getBlockState(pos.down()).isIn(BlockTags.VALID_SPAWN) && isLightLevelValidForNaturalSpawn(worldAccess, pos);
 	}
 
 	private class PickupItemGoal extends Goal {
+		// Just some number; might take one or two more ticks until an item is picked up
+		// Unknown why this was done
 		private static final float PICKUP_CHANCE = 0.7F;
 		private final Random random;
 		private ItemEntity targetedItem;
@@ -302,9 +331,14 @@ public class HyenaEntity extends AnimalEntity implements Angerable {
 		@Override
 		public boolean canStart() {
 			if (HyenaEntity.this.hasAngerTime()) {
+				// If the hyena is angry, do not care about picking up items
 				return false;
 			}
 			else {
+				// Probably the longest line in this code
+				// Essentially, get all items in a distance of 8 something-units (blocks?)
+				// and filter them by the criteria of it the item is preferred over the current item, if existent
+				// or if the item is preferred at all. If it is not a preferred use that random chance stuff that doesn't really work at all and I am unsure how to implement it. Still not long enough.
 				List<ItemEntity> list = HyenaEntity.this.getWorld().getEntitiesByClass(ItemEntity.class, HyenaEntity.this.getBoundingBox().expand(8.0D, 8.0D, 8.0D), itemEntity -> {
 					if (!HyenaEntity.this.getMainHandStack().isEmpty()) {
 						return HyenaEntity.this.prefersItemOverEquipped(itemEntity.getStack());
@@ -327,6 +361,8 @@ public class HyenaEntity extends AnimalEntity implements Angerable {
 
 		@Override
 		public void start() {
+			// Why's this bounding box larger?
+			// Might need to make an extra method for this
 			List<ItemEntity> list = HyenaEntity.this.getWorld().getEntitiesByClass(ItemEntity.class, HyenaEntity.this.getBoundingBox().expand(10.0D, 10.0D, 10.0D), itemEntity -> {
 				if (!HyenaEntity.this.getMainHandStack().isEmpty()) {
 					return HyenaEntity.this.prefersItemOverEquipped(itemEntity.getStack());
@@ -351,6 +387,7 @@ public class HyenaEntity extends AnimalEntity implements Angerable {
 		@Override
 		public void tick() {
 			if (!HyenaEntity.this.getWorld().isClient()) {
+				// Because this is in a goal, this will only run when canStart() returns true
 				HyenaEntity.this.playEatSound();
 				HyenaEntity.this.getWorld().sendEntityStatus(HyenaEntity.this, EntityStatuses.CREATE_EATING_PARTICLES);
 
@@ -365,9 +402,12 @@ public class HyenaEntity extends AnimalEntity implements Angerable {
 		public boolean canStart() {
 			ItemStack itemStack = HyenaEntity.this.getMainHandStack();
 			if (itemStack.isEmpty()) {
+				// Always return false when no equipped
+				// as expected. Air ain't edible
 				return false;
 			}
 			else {
+				// Wait until that timer has counted down
 				return HyenaEntity.this.shouldEatTimer < 0;
 			}
 		}
@@ -378,6 +418,7 @@ public class HyenaEntity extends AnimalEntity implements Angerable {
 		}
 	}
 
+	// Hyenas deserve to have a loving home
 	public class GoToVillageGoal extends net.minecraft.entity.ai.goal.GoToVillageGoal {
 		public GoToVillageGoal(int searchRange) {
 			super(HyenaEntity.this, searchRange);

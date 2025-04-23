@@ -62,6 +62,7 @@ public class HyenaEntityModel extends EntityModel<HyenaEntityRenderState> {
 						.cuboid(EntityModelPartNames.UPPER_BODY, -4.5F, -3.75F, -6.5F, 9.0F, 8.0F, 6.0F),
 				ModelTransform.origin(0.0F, 13.75F, 0.5F));
 
+		// All legs are equal
 		ModelPartBuilder legBuilder = ModelPartBuilder.create()
 				.uv(0, 22)
 				.cuboid(-1.5F, 1.0F, -1.5F, 3.0F, 7.0F, 3.0F);
@@ -90,6 +91,7 @@ public class HyenaEntityModel extends EntityModel<HyenaEntityRenderState> {
 		float animProgress = hyenaEntityRenderState.limbSwingAnimationProgress;
 		float amplitude = hyenaEntityRenderState.limbSwingAmplitude;
 
+		// Mojangs way of calculating leg and tail motion when an entity is walking. Somewhat
 		this.rightHindLeg.pitch = MathHelper.cos(animProgress * 0.6662F) * 1.4F * amplitude;
 		this.leftHindLeg.pitch = MathHelper.cos(animProgress * 0.6662F + (float) Math.PI) * 1.4F * amplitude;
 		this.rightFrontLeg.pitch = MathHelper.cos(animProgress * 0.6662F + (float) Math.PI) * 1.4F * amplitude;

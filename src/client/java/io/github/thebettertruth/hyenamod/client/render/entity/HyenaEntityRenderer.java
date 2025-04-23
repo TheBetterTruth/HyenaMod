@@ -21,6 +21,7 @@ public class HyenaEntityRenderer extends AgeableMobEntityRenderer<HyenaEntity, H
 
 	public HyenaEntityRenderer(EntityRendererFactory.Context context) {
 		super(context, new HyenaEntityModel(context.getPart(HyenaModClient.HYENA_MODEL_LAYER)), new HyenaEntityModel(context.getPart(HyenaModClient.HYENA_BABY_MODEL_LAYER)), 0.5F);
+		// Allow us to render the item the hyena's holding
 		this.addFeature(new HyenaHeldItemFeatureRenderer(this));
 	}
 
@@ -37,6 +38,7 @@ public class HyenaEntityRenderer extends AgeableMobEntityRenderer<HyenaEntity, H
 	@Override
 	public void updateRenderState(HyenaEntity hyenaEntity, HyenaEntityRenderState hyenaEntityRenderState, float f) {
 		super.updateRenderState(hyenaEntity, hyenaEntityRenderState, f);
+		// Do the item-rendering stuff
 		ItemHolderEntityRenderState.update(hyenaEntity, hyenaEntityRenderState, this.itemModelResolver);
 		hyenaEntityRenderState.tailAngle = hyenaEntity.getTailAngle();
 	}
