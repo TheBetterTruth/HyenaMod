@@ -11,13 +11,10 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.SpawnLocationTypes;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.BiomeTags;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.Heightmap;
-import org.jetbrains.annotations.NotNull;
 
 public class HyenaMod implements ModInitializer {
 	public static final String MODID = "hyenamod";
@@ -28,7 +25,7 @@ public class HyenaMod implements ModInitializer {
 					.eyeHeight(0.8F)
 					.maxTrackingRange(32)
 					.dimensions(0.6F, 0.9F)
-					.build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(MODID, "hyena"))));
+					.build());
 	public static final SoundEvent HYENA_LAUGH_SOUND = Registry.register(Registries.SOUND_EVENT, Identifier.of(MODID, "hyena_laugh"),
 			SoundEvent.of(Identifier.of(MODID, "hyena_laugh")));
 	public static final SoundEvent HYENA_HURT_SOUND = Registry.register(Registries.SOUND_EVENT, Identifier.of(MODID, "hyena_hurt"),

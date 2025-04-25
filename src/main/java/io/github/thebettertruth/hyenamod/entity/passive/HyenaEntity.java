@@ -53,8 +53,7 @@ public class HyenaEntity extends AnimalEntity implements Angerable {
 	public HyenaEntity(EntityType<? extends HyenaEntity> entityType, World world) {
 		super(entityType, world);
 		this.setCanPickUpLoot(true);
-		this.setDropGuaranteed(EquipmentSlot.MAINHAND);
-		this.getNavigation().setMaxFollowRange(32.0F);
+		this.setEquipmentDropChance(EquipmentSlot.MAINHAND, 1);
 		this.resetEatingTimer();
 	}
 
@@ -83,7 +82,7 @@ public class HyenaEntity extends AnimalEntity implements Angerable {
 		this.goalSelector.add(10, new LookAtEntityGoal(this, PlayerEntity.class, 8.0F));
 		this.goalSelector.add(11, new LookAroundGoal(this));
 		this.targetSelector.add(1, (new RevengeGoal(this)).setGroupRevenge());
-		this.targetSelector.add(2, new ActiveTargetGoal<>(this, LivingEntity.class, false, (entity, world) -> {
+		this.targetSelector.add(2, new ActiveTargetGoal<>(this, LivingEntity.class, false, (entity) -> {
 			EntityType<?> t = entity.getType();
 
 			if (this.getMainHandStack().isEmpty() || !this.getMainHandStack().contains(DataComponentTypes.FOOD)) {
@@ -121,14 +120,14 @@ public class HyenaEntity extends AnimalEntity implements Angerable {
 
 	@Override
 	public @Nullable PassiveEntity createChild(ServerWorld world, PassiveEntity entity) {
-		return HyenaMod.HYENA.create(world, SpawnReason.BREEDING);
+		return HyenaMod.HYENA.create(world);
 	}
 
 	public static DefaultAttributeContainer.Builder createHyenaAttributes() {
-		return AnimalEntity.createAnimalAttributes()
-				.add(EntityAttributes.MOVEMENT_SPEED, 0.3D)
-				.add(EntityAttributes.MAX_HEALTH, 8.0D)
-				.add(EntityAttributes.ATTACK_DAMAGE, 4.0D);
+		return AnimalEntity.createMobAttributes()
+				.add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3D)
+				.add(EntityAttributes.GENERIC_MAX_HEALTH, 8.0D)
+				.add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 4.0D);
 	}
 
 	@Override
@@ -149,8 +148,8 @@ public class HyenaEntity extends AnimalEntity implements Angerable {
 	}
 
 	@Override
-	protected void playEatSound() {
-		this.playSound(SoundEvents.ENTITY_GENERIC_EAT.value(), 0.15F, 1.0F);
+	public SoundEvent getEatSound(ItemStack stack) {
+		return SoundEvents.ENTITY_GENERIC_EAT;
 	}
 
 	@Override
@@ -227,7 +226,7 @@ public class HyenaEntity extends AnimalEntity implements Angerable {
 	protected void drop(ServerWorld world, DamageSource damageSource) {
 		ItemStack itemStack = this.getMainHandStack();
 
-		if (this.dropStack(world, itemStack) != null) {
+		if (this.dropStack(itemStack) != null) {
 			this.equipStack(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
 		}
 
@@ -249,12 +248,12 @@ public class HyenaEntity extends AnimalEntity implements Angerable {
 	// Somehow there are kind of multiple functions.
 	// But it works, don't attempt to fix it.
 	@Override
-	public boolean canGather(ServerWorld world, ItemStack stack) {
+	public boolean canGather(ItemStack stack) {
 		return this.canPickupItem(stack);
 	}
 
 	@Override
-	protected void loot(ServerWorld world, ItemEntity itemEntity) {
+	protected void loot(ItemEntity itemEntity) {
 		ItemStack itemStack = itemEntity.getStack();
 
 		if (this.canPickupItem(itemStack)) {
@@ -388,7 +387,7 @@ public class HyenaEntity extends AnimalEntity implements Angerable {
 		public void tick() {
 			if (!HyenaEntity.this.getWorld().isClient()) {
 				// Because this is in a goal, this will only run when canStart() returns true
-				HyenaEntity.this.playEatSound();
+				HyenaEntity.this.playSound(HyenaEntity.this.getEatSound(HyenaEntity.this.getMainHandStack()));
 				HyenaEntity.this.getWorld().sendEntityStatus(HyenaEntity.this, EntityStatuses.CREATE_EATING_PARTICLES);
 
 				if (HyenaEntity.this.eatingTime-- < 0) {

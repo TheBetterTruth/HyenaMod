@@ -14,11 +14,9 @@ import net.minecraft.util.Identifier;
 @Environment(EnvType.CLIENT)
 public class HyenaModClient implements ClientModInitializer {
 	public static final EntityModelLayer HYENA_MODEL_LAYER = new EntityModelLayer(Identifier.of(HyenaMod.MODID, "hyena"), "main");
-	public static final EntityModelLayer HYENA_BABY_MODEL_LAYER = new EntityModelLayer(Identifier.of(HyenaMod.MODID, "hyena_baby"), "main");
 
 	public void onInitializeClient() {
 		EntityRendererRegistry.register(HyenaMod.HYENA, HyenaEntityRenderer::new);
 		EntityModelLayerRegistry.registerModelLayer(HYENA_MODEL_LAYER, HyenaEntityModel::getTexturedModelData);
-		EntityModelLayerRegistry.registerModelLayer(HYENA_BABY_MODEL_LAYER, HyenaEntityModel::getBabyTexturedModelData);
 	}
 }
