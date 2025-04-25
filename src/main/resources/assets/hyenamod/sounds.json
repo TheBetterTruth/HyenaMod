@@ -1,24 +1,24 @@
 {
   "hyena_laugh": {
-    "subtitle": "subtitles.hyenamod.hyena_laugh",
+    "subtitle": "subtitles.entity.hyena.laugh",
     "sounds": [
       "hyenamod:entity/hyena/hyena_laugh"
     ]
   },
   "hyena_hurt": {
-    "subtitle": "subtitles.hyenamod.hyena_hurt",
+    "subtitle": "subtitles.entity.hyena.hurt",
     "sounds": [
       "hyenamod:entity/hyena/hyena_hurt"
     ]
   },
   "hyena_death": {
-    "subtitle": "subtitles.hyenamod.hyena_death",
+    "subtitle": "subtitles.entity.hyena.death",
     "sounds": [
       "hyenamod:entity/hyena/hyena_hurt"
     ]
   },
   "hyena_step": {
-    "subtitle": "subtitles.hyenamod.hyena_step",
+    "subtitle": "subtitles.entity.hyena.step",
     "sounds":[
       "minecraft:mob/wolf/step1",
       "minecraft:mob/wolf/step2",
