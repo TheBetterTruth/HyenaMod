@@ -2,5 +2,6 @@
   "entity.hyenamod.hyena": "Hyena",
   "subtitles.entity.hyena.hurt": "Hyena hurts",
   "subtitles.entity.hyena.laugh": "Hyena laughs",
-  "subtitles.entity.hyena.step": "Hyena steps"
+  "subtitles.entity.hyena.death": "Hyena dies",
+  "subtitles.entity.hyena.step": "Footsteps"
 }
