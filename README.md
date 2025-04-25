@@ -18,7 +18,7 @@ A minecraft mod that enriches minecraft savannas with hyenas.
   > Players have a brief window to recover stolen items - either by killing a hyena or distracting it with a more preferred item.
 
 ## Credit
-- **Mod idea**: @vico13 on Discord
+- **Mod idea**: https://github.com/vico93
 - **Hyena sounds**: Provided by [Freesound](https://freesound.org)
 
 ## License
